@@ -15,7 +15,8 @@ require('executor.php');
 $config = array(
 	array('KuaiPan', 'Your username', 'Your password'),
 	array('XiaMi', 'Your username', 'Your password'),
-	array('OneOneFive', 'Your username', 'Your password')
+	array('OneOneFive', 'Your username', 'Your password'),
+	array('YinYueTai', 'Your username', 'Your password'),
 	);
 
 //执行签到

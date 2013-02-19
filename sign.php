@@ -6,9 +6,10 @@
 class Sign
 {
 	//日志状态
-	const SUCCESS = '签到成功';
-	const FAILED = '签到失败';
-	const SIGNED = '今天已签到';
+	const SUCCESS     = '签到成功';
+	const SIGNED      = '今天已签到';
+	const FAILED      = '签到失败';
+	const LOGINFAILED = '登录失败';
 
 	//用户名和密码
 	protected $username;

@@ -38,7 +38,7 @@ class KuaiPan extends Sign
 			$loginResult = $this->POSTRequest($this->postUrl, $data);
 			$loginResponse = json_decode($loginResult);
 			if($loginResponse->state != '1')
-				$this->logString .= '登录失败';
+				$this->logString .= self::LOGINFAILED;
 		}
 		else
 			$this->GETRequest($this->loginUrl, true);
