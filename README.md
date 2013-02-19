@@ -8,7 +8,7 @@ AutoSign
 
 Example
 ======
-{{{
+```php
 require('executor.php');
 
 //签到账户信息数组
@@ -20,4 +20,4 @@ $config = array(
 
 //执行签到
 $executor = new Executor($config);
-}}}
+```
