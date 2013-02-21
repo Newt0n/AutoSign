@@ -8,11 +8,12 @@ class Executor
 	/**
 	 * 构造函数
 	 * @param array $config 需要签到的账户信息数组
+	 * @param array $log 是否输出日志
 	 */
-	public function __construct($config)
+	public function __construct($config, $log = true)
 	{
 		//执行签到方法
-		$this->execute($config);
+		$this->execute($config, $log);
 	}
 
 /**
@@ -20,7 +21,7 @@ class Executor
  * @param array $config 需要签到的账户信息数组
  * @return void
  */
-	public function execute($config)
+	public function execute($config, $log)
 	{
 		foreach ($config as $userInfo)
 		{
@@ -43,7 +44,7 @@ class Executor
 				$instance->sign();
 
 			//输出日志到文件
-			if(!isset($config['log']) || $config['log'])
+			if($log)
 				$instance->log();
 		}
 	}

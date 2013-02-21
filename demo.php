@@ -17,10 +17,10 @@ $config = array(
 	array('XiaMi', 'Your username', 'Your password'),
 	array('OneOneFive', 'Your username', 'Your password'),
 	array('YinYueTai', 'Your username', 'Your password'),
-	//设置 log 为 false 不输出日志
-	// 'log'=>false
 	);
 
 $executor = new Executor($config);
+//加参数 $log = false 不输出日志文件
+//$executor = new Executor($config, false);
 
 ?>
