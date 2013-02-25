@@ -40,6 +40,8 @@ class OneOneFive extends Sign
 
 		$getResult = $this->GETRequest($this->loginUrl, true);
 		preg_match('/take_token:\s*\'([^\']*)/', $getResult, $match);
+		if(empty($match[0]))
+			$this->retry();
 		if(empty($match[1]))
 		{
 			$this->logString .= self::SIGNED;
@@ -49,10 +51,10 @@ class OneOneFive extends Sign
 		$token = $match[1];
 		$signResult = $this->GETRequest($this->signUrl.$token, true);
 		$signResponse = json_decode($signResult);
-		if($signResponse->state)
+		if(isset($signResponse->state))
 			$this->logString .= self::SUCCESS.' 获得空间：'.$signResponse->picked.' 总容量：'.$signResponse->total_size;
 		else
-			return $this->retry();
+			$this->retry();
 	}
 }
 

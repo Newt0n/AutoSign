@@ -49,7 +49,7 @@ class YinYueTai extends Sign
 			if(!isset($loginResponse->error) || $loginResponse->error)
 			{
 				$this->logString .= self::LOGINFAILED;
-				die($this->logString);
+				$this->retry();
 			}
 		}
 
@@ -65,7 +65,7 @@ class YinYueTai extends Sign
 				$this->logString .= ' 已连续签到 '.$signResponse->signIn->continuousDays.' 天';
 		}
 		else
-			return $this->retry();
+			$this->retry();
 	}
 }
 
