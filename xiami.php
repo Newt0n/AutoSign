@@ -26,7 +26,9 @@ class XiaMi extends Sign
 	 */
 	public function sign()
 	{
-		if(!$this->isCookieExist)
+		if($this->isCookieExist)
+			$this->GETRequest($this->homeUrl, true);
+		else
 		{
 			$this->GETRequest($this->loginUrl);
 
@@ -40,19 +42,17 @@ class XiaMi extends Sign
 				);
 			$loginResult = $this->POSTRequest($this->loginUrl, $data);
 		}
-		else
-			$this->GETRequest($this->homeUrl, true);
 
 		$header = array(
 			'Host: www.xiami.com',
 			'Referer: http://www.xiami.com/',
 			'X-Requested-With: XMLHttpRequest',
 			);
-		$response = $this->POSTRequest($this->signUrl, array(), $header);
-		if(empty($response) || intval($response) < 1)
+		$signResponse = $this->POSTRequest($this->signUrl, array(), $header);
+		if(empty($signResponse) || intval($signResponse) < 1)
 			return $this->retry();
 
-		$this->logString .= self::SIGNED.' 已连续签到 '.$response.' 天';
+		$this->logString .= self::SIGNED.' 已连续签到 '.$signResponse.' 天';
 	}
 }
 

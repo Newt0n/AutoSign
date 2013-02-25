@@ -35,27 +35,36 @@ class KuaiPan extends Sign
 				'isajax'=>'yes'
 				);
 
-			$loginResult = $this->POSTRequest($this->postUrl, $data);
-			$loginResponse = json_decode($loginResult);
-			if($loginResponse->state != '1')
+			$loginResponse = $this->POSTRequest($this->postUrl, $data);
+			$loginResponse = json_decode($loginResponse);
+			if(!isset($loginResponse->state) || $loginResponse->state != '1')
+			{
 				$this->logString .= self::LOGINFAILED;
+				throw new Exception('Login failed', 0);
+				
+			}
 		}
 		else
 			$this->GETRequest($this->loginUrl, true);
 
-		$signResult = $this->GETRequest($this->signUrl, true);
-		$signResponse = json_decode($signResult);
-		switch ($signResponse->state) {
+		$signResponse = $this->GETRequest($this->signUrl, true);
+		$signResponse = json_decode($signResponse);
+		$state = null;
+		if(isset($signResponse->state))
+			$state = $signResponse->state;
+
+		switch ($state)
+		{
 			case '-102':
 				$this->logString .= self::SIGNED;
-				break;
+			break;
 			case '1':
 				$this->logString .= self::SUCCESS.' 获得空间：'.$signResponse->rewardsize.'M';
-				break;
+			break;
 			default:
-				return $this->retry();
-				break;
-		}
+				$this->retry();
+			break;
+		}			
 	}
 }
 

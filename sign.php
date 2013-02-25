@@ -17,13 +17,14 @@ class Sign
 
 	//cookie 文件名
 	protected $cookieFile;
+	protected $cookiePath;
+	protected $cookieName;
 
 	//输出日志内容
 	protected $logString;
 
 	//CURL 选项
 	protected $curl_opts = array(
-			// CURLOPT_HEADER=>true,
 			CURLOPT_RETURNTRANSFER =>true,
 			CURLINFO_HEADER_OUT=>true,
 			CURLOPT_USERAGENT =>'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.58 Safari/537.22'
@@ -34,7 +35,7 @@ class Sign
 	 */
 	private function __construct()
 	{
-
+		$this->cookiePath = dirname(__FILE__).'/cookie/';
 	}
 
 	/**
@@ -47,23 +48,24 @@ class Sign
 	{
 		$this->username = $username;
 		$this->password = $password;
-		$this->cookieFile = dirname(__FILE__).'/cookie/'.$this->preFix.$this->username.'.cookie';
-		// echo $this->cookieFile.PHP_EOL;
+		$this->cookieName = $this->preFix.$this->username;
+		$this->cookieFile = $this->cookiePath.$this->cookieName.'.cookie';
 		if(!file_exists($this->cookieFile))
 		{
 			fopen($this->cookieFile, 'w+');
 			$this->isCookieExist = false;
 		}
-		$this->logString = $this->preFix.$this->username.' ';
+		$this->logString = $this->cookieName.' ';
 	}
 
 	/**
 	 * 处理配置并发送POST请求
-	 * @param string $url
-	 * @param array  $data POST 数据数组
-	 * @param array  $header 需要构造 header 内容的数组
+	 * @param string  $url
+	 * @param array   $data POST 数据数组
+	 * @param array   $httpheader 需要构造 httpheader 内容的数组
+	 * @param boolean $header 是否输出 header 信息
 	 */
-	protected function POSTRequest($url, $data = array(), $header = array())
+	protected function POSTRequest($url, $data = array(), $httpheader = array(), $header = false)
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
@@ -73,10 +75,12 @@ class Sign
 		$options[CURLOPT_SSL_VERIFYHOST] = false;
 		$options[CURLOPT_FOLLOWLOCATION] = true;
 		// $options[CURLOPT_COOKIE] = '';
-		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
-		if(!empty($header))
-			$options[CURLOPT_HTTPHEADER] = $header;
+		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
+		if(!empty($httpheader))
+			$options[CURLOPT_HTTPHEADER] = $httpheader;
+		if($header)
+			$options[CURLOPT_HEADER] = true;
 
 		return $this->curl($options);
 	}
@@ -86,7 +90,7 @@ class Sign
 	 * @param string  $url
 	 * @param boolean $withCookie 是否带 cookie(默认不带)
 	 */
-	protected function GETRequest($url, $withCookie = false)
+	protected function GETRequest($url, $withCookie = false, $header = false)
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
@@ -94,7 +98,8 @@ class Sign
 
 		if($withCookie)
 			$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
-
+		if($header)
+			$options[CURLOPT_HEADER] = true;
 		return $this->curl($options);
 	}
 
@@ -126,21 +131,16 @@ class Sign
 	}
 
 	/**
-	 * 签到失败后删除 cookie 后重试
-	 * @return array 重试信息
+	 * 删除 cookie，记录失败日志并抛出异常
+	 * @param string $delFileName 需要连带删除的文件路径
 	 */
-	public function retry()
+	public function retry($delFileName = '')
 	{
-		if(unlink($this->cookieFile))
-			$this->isCookieExist = false;
-		else
-		{
-			$this->logString .= '删除 cookie 失败';
-			return;
-		}
-
-		$this->logString .= '签到失败，尝试删除 cookie 后重试 ';
-		return array('retry'=>true);
+		@unlink($this->cookieFile);
+		@unlink($delFileName);
+		$this->isCookieExist = false;
+		$this->logString .= '签到失败，删除 cookie 后重试 ';
+		throw new Exception("Retry", 0);
 	}
 
 	/**

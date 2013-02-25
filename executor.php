@@ -1,36 +1,50 @@
 <?php
+require('config.inc.php');
+define('SIGN_PATH', dirname(__FILE__));
+
 /**
  * 执行签到操作类
  * @author Newton <mciguu@gmail.com>
  */
 class Executor
-{
+{	
+	//允许的重试次数
+	private static $retryLimit = RETRY_LIMIT;
+	//是否输出日志
+	private static $log = LOG;
+	//失败超过上限微博通知
+	private static $notify = NOTIFY;
+
+	//错误次数
+	private $errCount = 0;
+
 	/**
 	 * 构造函数
-	 * @param array $config 需要签到的账户信息数组
-	 * @param array $log 是否输出日志
+	 * @param array $accounts 需要签到的账户信息数组
 	 */
-	public function __construct($config, $log = true)
+	public function __construct($accounts)
 	{
 		//执行签到方法
-		$this->execute($config, $log);
+		$this->execute($accounts);
 	}
 
 /**
  * 签到方法
- * @param array $config 需要签到的账户信息数组
- * @return void
+ * @param array $accounts 需要签到的账户信息数组
  */
-	public function execute($config, $log)
+	public function execute($accounts)
 	{
-		foreach ($config as $userInfo)
+		foreach ($accounts as $userInfo)
 		{
 			$svcName = $userInfo[0];
-			try {
+			try
+			{
 				//载入基类和要签到服务的子类
 				$this->fileLoader('sign.php');
 				$this->fileLoader(strtolower($svcName).'.php');
-			} catch (Exception $e) {
+			}
+			catch (Exception $e)
+			{
 				echo 'Error: '.$e->getMessage();
 			}
 
@@ -38,13 +52,28 @@ class Executor
 			$instance = $svcName::getInstance();
 			//配置数据并执行签到
 			$instance->init($userInfo[1], $userInfo[2]);
-			$msg = $instance->sign();
-			//签到失败后尝试删除 cookie 重试
-			if(isset($msg['retry']))
-				$instance->sign();
+
+			$errCount = $this->errCount;
+			while($errCount < self::$retryLimit)
+			{
+				try
+				{
+					$instance->sign();
+				}
+				catch (Exception $e)
+				{
+					$errCount++;
+					continue;
+				}
+
+				break;
+			}
+
+			// if(self::$notify && ($errCount >= self::$retryLimit))
+			// 	$this->weiboNotify($svcName);
 
 			//输出日志到文件
-			if($log)
+			if(self::$log)
 				$instance->log();
 		}
 	}
@@ -56,9 +85,20 @@ class Executor
 	private function fileLoader($filePath)
 	{
 		if(!file_exists($filePath))
-			throw new Exception("文件丢失", 1);
+			throw new Exception("文件丢失 ".$filePath, 1);
 		require_once($filePath);
 	}
+
+	// private function weiboNotify($svcName)
+	// {
+	// 	$this->fileLoader('weibo\config.php');
+	// 	$this->fileLoader('weibo\saetv2.ex.class.php');
+	// 	$token = file_get_contents(SIGN_PATH.'\weibo\token.oauth');
+	// 	$token = unserialize($token);
+		// $weibo = new SaeTClientV2( WB_AKEY , WB_SKEY , $token['access_token']);
+		
+		// $ret = $weibo->update($svcName.' 失败多次，请检查日志');
+	// }
 }
 
 ?>

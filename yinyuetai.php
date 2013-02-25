@@ -33,7 +33,9 @@ class YinYueTai extends Sign
 			'X-Requested-With: XMLHttpRequest'
 			);
 
-		if(!$this->isCookieExist)
+		if($this->isCookieExist)
+			$this->GETRequest($this->homeUrl, true);
+		else
 		{
 			$this->GETRequest($this->homeUrl);
 
@@ -50,12 +52,10 @@ class YinYueTai extends Sign
 				die($this->logString);
 			}
 		}
-		else
-			$this->GETRequest($this->homeUrl, true);
 
 		//签到
-		$signResult = $this->POSTRequest($this->signUrl, '', $header);
-		$signResponse = json_decode($signResult);
+		$signResponse = $this->POSTRequest($this->signUrl, '', $header);
+		$signResponse = json_decode($signResponse);
 
 		//返回结果处理
 		if(isset($signResponse->error))
