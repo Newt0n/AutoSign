@@ -13,7 +13,7 @@ AutoSign
 * YinYueTai 音悦台
 * DBank 华为网盘
 
- Example
+Example
 ======
 
 ```php
@@ -55,8 +55,6 @@ define('WEIBO_NAME', '');
 4. 访问 http://wwwroot/autosign/weibo/ 用注册应用的账户完成授权
 5. 完成
 
-*
+\* 此项默认关闭
 
-* 此项默认关闭
-
-* 删除 protected/weibo.token 再次执行 Step 4 可重新授权
+\*删除 protected/weibo.token 再次执行 Step 4 可重新授权
