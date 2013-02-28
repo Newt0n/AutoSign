@@ -21,7 +21,7 @@ class Sign
 	protected $cookieName;
 
 	//输出日志内容
-	protected $logString;
+	protected $logLine;
 
 	//CURL 选项
 	protected $curl_opts = array(
@@ -56,7 +56,7 @@ class Sign
 			$this->isCookieExist = false;
 		}
 
-		$this->logString = $this->cookieName.' ';
+		$this->logLine = $this->cookieName.' ';
 	}
 
 	/**
@@ -125,19 +125,17 @@ class Sign
 	 */
 	public function appendLog($log)
 	{
-		$this->logString .= $log;
+		$this->logLine .= $log;
 	}
 
 	/**
 	 * 输出日志
-	 * @return void
 	 */
-	public function log()
+	public function getLog()
 	{
-		date_default_timezone_set('PRC');
-		$this->logString .= ' '.date('Y-m-d H:i:s', time()).PHP_EOL;
-		echo $this->logString;
-		file_put_contents('sign.log', $this->logString, FILE_APPEND);
+		$this->logLine .= PHP_EOL;
+		echo $this->logLine,'<br>';
+		return $this->logLine;
 	}
 
 	/**
@@ -149,7 +147,7 @@ class Sign
 		@unlink($this->cookieFile);
 		@unlink($delFileName);
 		$this->isCookieExist = false;
-		$this->logString .= '签到失败，删除 cookie 后重试 ';
+		$this->logLine .= '签到失败，删除 cookie 后重试；';
 		throw new Exception("Retry", 0);
 	}
 

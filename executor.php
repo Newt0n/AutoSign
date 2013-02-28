@@ -10,16 +10,21 @@ class Executor
 {	
 	//错误次数
 	private $errCount = 0;
+	//日志文本
+	private $logText;
 	//Weibo 实例
 	private static $weibo = NULL; 
 
 	/**
-	 * 构造函数
+	 * 构造函数，记录时间戳并执行签到
 	 * @param array $accounts 需要签到的账户信息数组
 	 */
 	public function __construct($accounts)
-	{
-		//执行签到方法
+	{	
+		date_default_timezone_set('PRC');
+		$this->logText = date('Y-m-d H:i:s', time()).PHP_EOL;
+		echo $this->logText,'<br>';
+
 		$this->execute($accounts);
 	}
 
@@ -41,9 +46,8 @@ class Executor
 				echo $e->getMessage();
 			}
 
-			//获取该服务实例
+			//获取实例并初始化
 			$instance = $svcName::getInstance();
-			//配置数据并执行签到
 			$instance->init($userInfo[1], $userInfo[2]);
 
 			$errCount = $this->errCount;
@@ -72,10 +76,20 @@ class Executor
 					$instance->appendLog($e->getMessage());	
 				}
 
-			//输出日志
-			if(LOG)
-				$instance->log();
+			//记录日志
+			$this->logText .= $instance->getLog();
 		}
+		//输出日志
+			if(LOG)
+				$this->log();
+	}
+
+	/**
+	 * 输入日志到文件
+	 */
+	private function log()
+	{
+		file_put_contents('sign.log', $this->logText, FILE_APPEND);
 	}
 
 	/**
@@ -89,6 +103,10 @@ class Executor
 		require_once($filePath);
 	}
 
+	/**
+	 * 发送微博通知
+	 * @param  string $svcName 要通知的服务名称
+	 */
 	private function weiboNotify($svcName)
 	{
 		if(is_null(self::$weibo))
