@@ -35,7 +35,7 @@ class OneOneFive extends Sign
 				'login[time]'=>'on',
 				'back'=>'http://www.115.com'
 				);
-			$loginResp = $this->POSTRequest($this->postUrl, $data);
+			$loginResp = $this->post($this->postUrl, $data);
 		}
 
 		$getResp = $this->get($this->loginUrl);
