@@ -28,26 +28,27 @@ class KuaiPan extends Sign
 	{
 		if(!$this->isCookieExist)
 		{
-			$this->GETRequest($this->loginUrl);
+			$this->get($this->loginUrl);
 			$data = array(
 				'username'=>$this->username,
 				'userpwd'=>$this->password,
-				'isajax'=>'yes'
+				'isajax'=>'yes',
+				'rememberme'=>1
 				);
 
-			$loginResp = $this->POSTRequest($this->postUrl, $data);
+			$loginResp = $this->post($this->postUrl, $data);
 			$loginResp = json_decode($loginResp);
 			if(!isset($loginResp->state) || $loginResp->state != '1')
 			{
-				$this->logString .= self::LOGINFAILED;
+				$this->logLine .= self::LOGINFAILED;
 				throw new Exception('Login failed', 0);
 				
 			}
 		}
 		else
-			$this->GETRequest($this->loginUrl, true);
+			$this->get($this->loginUrl);
 
-		$signResp = $this->GETRequest($this->signUrl, true);
+		$signResp = $this->get($this->signUrl);
 		$signResp = json_decode($signResp);
 		$state = null;
 		if(isset($signResp->state))
@@ -56,10 +57,10 @@ class KuaiPan extends Sign
 		switch ($state)
 		{
 			case '-102':
-				$this->logString .= self::SIGNED;
+				$this->logLine .= self::SIGNED;
 			break;
 			case '1':
-				$this->logString .= self::SUCCESS.' 获得空间：'.$signResp->rewardsize.'M';
+				$this->logLine .= self::SUCCESS.' 获得空间：'.$signResp->rewardsize.'M';
 			break;
 			default:
 				$this->retry();

@@ -1059,10 +1059,18 @@ class SaeTClientV2
 	 * @param mixed $annotations 可选参数。元数据，主要是为了方便第三方应用记录一些适合于自己使用的信息。每条微博可以包含一个或者多个元数据。请以json字串的形式提交，字串长度不超过512个字符，或者数组方式，要求json_encode后字串长度不超过512个字符。具体内容可以自定。例如：'[{"type2":123}, {"a":"b", "c":"d"}]'或array(array("type2"=>123), array("a"=>"b", "c"=>"d"))。
 	 * @return array
 	 */
-	function update( $status, $lat = NULL, $long = NULL, $annotations = NULL )
+	function update( $status, $visible = 0, $list_id = NULL, $lat = NULL, $long = NULL, $annotations = NULL )
 	{
 		$params = array();
 		$params['status'] = $status;
+		if($visible == 3 && $list_id)
+		{
+			$params['visible'] = $visible;
+			$params['list_id'] = $list_id;
+		}
+		elseif($visible == 2)
+			$params['visible'] = $visible;
+		
 		if ($lat) {
 			$params['lat'] = floatval($lat);
 		}

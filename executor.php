@@ -12,8 +12,10 @@ class Executor
 	private $errCount = 0;
 	//日志文本
 	private $logText;
+	private $state = true;
 	//Weibo 实例
-	private static $weibo = NULL; 
+	private static $weibo = NULL;
+	private static $token = NULL;
 
 	/**
 	 * 构造函数，记录时间戳并执行签到
@@ -22,9 +24,11 @@ class Executor
 	public function __construct($accounts)
 	{	
 		date_default_timezone_set('PRC');
-		$this->logText = date('Y-m-d H:i:s', time()).PHP_EOL;
-		echo $this->logText,'<br>';
+		$timestamp = date('Y-m-d H:i:s', time());
+		$this->logText = $timestamp.PHP_EOL;
+		echo $timestamp,'<br>';
 
+		set_time_limit(60);
 		$this->execute($accounts);
 	}
 
@@ -43,7 +47,7 @@ class Executor
 			}
 			catch (Exception $e)
 			{
-				echo $e->getMessage();
+				die($e->getMessage());
 			}
 
 			//获取实例并初始化
@@ -66,26 +70,34 @@ class Executor
 				break;
 			}
 
-			if(NOTIFY && ($errCount >= RETRY_LIMIT))
-				try
-				{
-					$this->weiboNotify($svcName);
-				}
-				catch (Exception $e)
-				{
-					$instance->appendLog($e->getMessage());	
-				}
+			if($errCount >= RETRY_LIMIT)
+			{
+				$this->state = false;
+				if(NOTIFY_FAILED)
+					try
+					{
+						$status = $svcName.' 失败多次，请检查日志';
+						$this->weiboNotify($status);
+					}
+					catch (Exception $e)
+					{
+						$instance->appendLog($e->getMessage());	
+					}
+			}
 
 			//记录日志
 			$this->logText .= $instance->getLog();
 		}
 		//输出日志
-			if(LOG)
-				$this->log();
+		if(LOG)
+			$this->log();
+
+		if(NOTIFY_SUCCESS && $this->state)
+			$this->weiboNotify('All signed', 2);
 	}
 
 	/**
-	 * 输入日志到文件
+	 * 输出日志到文件
 	 */
 	private function log()
 	{
@@ -105,32 +117,31 @@ class Executor
 
 	/**
 	 * 发送微博通知
-	 * @param  string $svcName 要通知的服务名称
+	 * @param  string $status 要发布的微博内容
 	 */
-	private function weiboNotify($svcName)
+	private function weiboNotify($status, $visible = 0, $listId = NULL)
 	{
 		if(is_null(self::$weibo))
 		{
 			$this->fileLoader('weibo/config.php');
 			$this->fileLoader('weibo/saetv2.ex.class.php');
-			$tokenFile = 'protected/weibo.token';
-			if(file_exists($tokenFile))
+			if(file_exists(OAUTH_FILE))
 			{
-				$token = file_get_contents($tokenFile);
-				$token = unserialize($token);
+				self::$token = file_get_contents(OAUTH_FILE);
+				self::$token = unserialize(self::$token);
 			}
 			else
 				throw new Exception("微博认证文件不存在");
 
-			self::$weibo = new SaeTClientV2( WB_AKEY , WB_SKEY , $token['access_token']);
+			self::$weibo = new SaeTClientV2( WB_AKEY , WB_SKEY , self::$token['access_token']);
 		}
-
 		$weiboName = WEIBO_NAME;
 		if(empty($weiboName))
-			$weiboName = $token['name'];
+			$weiboName = self::$token['name'];
 
-		$resp = self::$weibo->update('@'.$weiboName.' '.$svcName.' 失败多次，请检查日志');
-		$resp = json_decode($resp);
+		$status = '@'.$weiboName.' '.$status;
+		$resp = self::$weibo->update($status, $visible, $listId);
+		var_dump($resp);
 		if(isset($resp->error_code))
 			throw new Exception($resp->error);
 	}

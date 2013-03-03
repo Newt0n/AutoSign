@@ -27,6 +27,7 @@ class Sign
 	protected $curl_opts = array(
 			CURLOPT_RETURNTRANSFER =>true,
 			CURLINFO_HEADER_OUT=>true,
+			CURLOPT_TIMEOUT=>10,
 			CURLOPT_USERAGENT =>'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.58 Safari/537.22'
 			);
 
@@ -60,13 +61,13 @@ class Sign
 	}
 
 	/**
-	 * 处理配置并发送POST请求
+	 * 处理配置并发送 POST 请求
 	 * @param string  $url
 	 * @param array   $data POST 数据数组
 	 * @param array   $httpheader 需要构造 httpheader 内容的数组
 	 * @param boolean $header 是否输出 header 信息
 	 */
-	protected function POSTRequest($url, $data = array(), $httpheader = array(), $header = false)
+	protected function post($url, $data = array(), $httpheader = array(), $header = false)
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
@@ -75,7 +76,6 @@ class Sign
 		$options[CURLOPT_SSL_VERIFYPEER] = false;
 		$options[CURLOPT_SSL_VERIFYHOST] = false;
 		$options[CURLOPT_FOLLOWLOCATION] = true;
-		// $options[CURLOPT_COOKIE] = '';
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
 		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
 		if(!empty($httpheader))
@@ -89,16 +89,14 @@ class Sign
 	/**
 	 * 发送 GET 请求
 	 * @param string  $url
-	 * @param boolean $withCookie 是否带 cookie(默认不带)
+	 * @param boolean $header 是否输出 header 信息
 	 */
-	protected function GETRequest($url, $withCookie = false, $header = false)
+	protected function get($url, $header = false)
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
-
-		if($withCookie)
-			$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
+		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
 		if($header)
 			$options[CURLOPT_HEADER] = true;
 		return $this->curl($options);
@@ -147,7 +145,7 @@ class Sign
 		@unlink($this->cookieFile);
 		@unlink($delFileName);
 		$this->isCookieExist = false;
-		$this->logLine .= '签到失败，删除 cookie 后重试；';
+		$this->logLine .= '签到失败，重试；';
 		throw new Exception("Retry", 0);
 	}
 

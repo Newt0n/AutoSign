@@ -28,7 +28,7 @@ class OneOneFive extends Sign
 	{
 		if(!$this->isCookieExist)
 		{
-			$this->GETRequest($this->loginUrl);
+			$this->get($this->loginUrl);
 			$data = array(
 				'login[account]'=>$this->username,
 				'login[passwd]'=>$this->password,
@@ -38,21 +38,21 @@ class OneOneFive extends Sign
 			$loginResp = $this->POSTRequest($this->postUrl, $data);
 		}
 
-		$getResp = $this->GETRequest($this->loginUrl, true);
+		$getResp = $this->get($this->loginUrl);
 		preg_match('/take_token:\s*\'([^\']*)/', $getResp, $match);
 		if(empty($match[0]))
 			$this->retry();
 		if(empty($match[1]))
 		{
-			$this->logString .= self::SIGNED;
+			$this->logLine .= self::SIGNED;
 			return;
 		}
 
 		$token = $match[1];
-		$signResp = $this->GETRequest($this->signUrl.$token, true);
+		$signResp = $this->get($this->signUrl.$token);
 		$signResp = json_decode($signResp);
 		if(isset($signResp->state))
-			$this->logString .= self::SUCCESS.' 获得空间：'.$signResp->picked.' 总容量：'.$signResp->total_size;
+			$this->logLine .= self::SUCCESS.' 获得空间：'.$signResp->picked.' 总容量：'.$signResp->total_size;
 		else
 			$this->retry();
 	}

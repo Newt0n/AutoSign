@@ -6,4 +6,7 @@ define( "WB_AKEY" , 'Your App key' );
 define( "WB_SKEY" , 'Your App Secret' );
 define( "WB_CALLBACK_URL" , 'Your callback URL' );
 
-define( "OAUTH_FILE", '../protected/weibo.token');
+//授权 token 文件位置
+define( "OAUTH_FILE", dirname(dirname(__FILE__)).'/protected/weibo.token');
+//接收通知微博 ID
+define('WEIBO_NAME', 'Newton');

@@ -33,36 +33,36 @@ class YinYueTai extends Sign
 			'X-Requested-With: XMLHttpRequest'
 			);
 
-		if($this->isCookieExist)
-			$this->GETRequest($this->homeUrl, true);
-		else
+		if(!$this->isCookieExist)
 		{
-			$this->GETRequest($this->homeUrl);
+			$this->get($this->homeUrl);
 
 			$data = array(
 				'email'=>$this->username,
 				'password'=>$this->password,
 				);
-			$loginResp = $this->POSTRequest($this->loginUrl, http_build_query($data), $header);
+			$loginResp = $this->post($this->loginUrl, http_build_query($data), $header);
 			$loginResp = json_decode($loginResp);
 
 			if(!isset($loginResp->error) || $loginResp->error)
 			{
-				$this->logString .= self::LOGINFAILED;
+				$this->logLine .= self::LOGINFAILED;
 				$this->retry();
 			}
 		}
+		else
+			$this->get($this->homeUrl);
 
 		//签到
-		$signResp = $this->POSTRequest($this->signUrl, '', $header);
+		$signResp = $this->post($this->signUrl, '', $header);
 		$signResp = json_decode($signResp);
 
 		//返回结果处理
 		if(isset($signResp->error))
 		{
-			$this->logString .= $signResp->message;
+			$this->logLine .= $signResp->message;
 			if(!$signResp->error)
-				$this->logString .= ' 已连续签到 '.$signResp->signIn->continuousDays.' 天';
+				$this->logLine .= ' 已连续签到 '.$signResp->signIn->continuousDays.' 天';
 		}
 		else
 			$this->retry();

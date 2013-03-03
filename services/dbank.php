@@ -70,12 +70,12 @@ class DBank extends Sign
 
 			//获取 k 值
 			$kUrl = $this->loginUrl.'nsp_app=48049';
-			$kResp = $this->POSTRequest($kUrl, http_build_query($loginData), $httpheader);
+			$kResp = $this->post($kUrl, http_build_query($loginData), $httpheader);
 			$kResp = json_decode($kResp);
 
 			//访问验证地址，获得 cookie
 			$authUrl = $this->loginUrl.'k='.$kResp->k;
-			$header = $this->GETRequest($authUrl, true, true);
+			$header = $this->get($authUrl, true, true);
 			preg_match_all('/Set-Cookie: (.+?)=(.+?);/', $header, $match);
 			$cookies = array();
 			foreach ($match[1] as $key => $value)
@@ -115,16 +115,16 @@ class DBank extends Sign
 		$signUrl = $this->signUrl.http_build_query($signParams);
 
 		//执行请求
-		$signResp = $this->GETRequest($signUrl);
+		$signResp = $this->get($signUrl);
 		$signResp = json_decode($signResp);
 
 		//处理请求结果
 		if(isset($signResp->retdesc))	
-			$this->logString .= $signResp->retdesc;
+			$this->logLine .= $signResp->retdesc;
 		else
 			$this->retry($this->sercookieFile);
 
-		$this->logString .= ' ';
+		$this->logLine .= ' ';
 	}
 }
 
