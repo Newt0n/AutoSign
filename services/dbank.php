@@ -69,10 +69,12 @@ class DBank extends Sign
 				);
 
 			//获取 k 值
-			$kUrl = $this->loginUrl.'nsp_app=48049';
+			$kUrl  = $this->loginUrl.'nsp_app=48049';
 			$kResp = $this->post($kUrl, http_build_query($loginData), $httpheader);
 			$kResp = json_decode($kResp);
-
+			if(!isset($kResp->k))
+				throw new Exception("Login failed", 0);
+			
 			//访问验证地址，获得 cookie
 			$authUrl = $this->loginUrl.'k='.$kResp->k;
 			$header = $this->get($authUrl, true, true);

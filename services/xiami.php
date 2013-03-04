@@ -39,8 +39,8 @@ class XiaMi extends Sign
 				);
 			$loginResp = $this->post($this->loginUrl, $data);
 		}
-		// else
-		// 	$this->get($this->homeUrl);
+		else
+			$this->get($this->homeUrl);//获取新的 t_sign_auth 值
 
 		$header = array(
 			'Host: www.xiami.com',
