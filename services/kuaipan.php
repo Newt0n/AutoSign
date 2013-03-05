@@ -28,7 +28,7 @@ class KuaiPan extends Sign
 	{
 		if(!$this->isCookieExist)
 		{
-			$this->get($this->loginUrl);
+			$this->get($this->loginUrl);//获取 cookie
 			$data = array(
 				'username'=>$this->username,
 				'userpwd'=>$this->password,
@@ -39,11 +39,7 @@ class KuaiPan extends Sign
 			$loginResp = $this->post($this->postUrl, $data);
 			$loginResp = json_decode($loginResp);
 			if(!isset($loginResp->state) || $loginResp->state != '1')
-			{
-				$this->logLine .= self::LOGINFAILED;
-				throw new Exception('Login failed', 0);
-				
-			}
+				$this->retry(0);
 		}
 		else
 			$this->get($this->loginUrl);
@@ -65,7 +61,7 @@ class KuaiPan extends Sign
 			default:
 				$this->retry();
 			break;
-		}			
+		}
 	}
 }
 

@@ -41,10 +41,10 @@ Configure
 define('LOG', TRUE);
 //允许的重试次数
 define('RETRY_LIMIT', 3);
-//失败超过上限微博通知
-define('NOTIFY', FALSE);
-//接收通知微博 ID
-define('WEIBO_NAME', '');
+//失败超过上限发送通知
+define('NOTIFY_FAILED', FALSE);
+//执行完成发送通知
+define('NOTIFY_SUCCESS', FALSE);
 ```
 ### Weibo Notification*
 当执行失败次数达到允许重试的上限后，通过新浪微博 @ 设定的用户名实现通知，基于新浪微博官方 SDK，配置步骤如下：

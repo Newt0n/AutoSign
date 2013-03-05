@@ -8,8 +8,8 @@ class Sign
 	//日志状态
 	const SUCCESS     = '签到成功';
 	const SIGNED      = '今天已签到';
-	const FAILED      = '签到失败';
-	const LOGINFAILED = '登录失败';
+	const FAILED      = '签到失败，重试；';
+	const LOGINFAILED = '登录失败；';
 
 	//用户名和密码
 	protected $username;
@@ -138,15 +138,25 @@ class Sign
 
 	/**
 	 * 删除 cookie，记录失败日志并抛出异常
+	 * @param int $errno 错误码 0:登录失败 1:签到失败
 	 * @param string $delFileName 需要连带删除的文件路径
 	 */
-	public function retry($delFileName = '')
+	public function retry($errno = 1, $delFileName = '')
 	{
-		@unlink($this->cookieFile);
-		@unlink($delFileName);
-		$this->isCookieExist = false;
-		$this->logLine .= '签到失败，重试；';
-		throw new Exception("Retry", 0);
+		switch ($errno)
+		{
+			case 0:
+				$this->logLine .= self::LOGINFAILED;
+				throw new Exception('Login failed', $errno);
+				break;
+			case 1:
+				@unlink($this->cookieFile);
+				@unlink($delFileName);
+				$this->isCookieExist = false;
+				$this->logLine .= self::FAILED;
+				throw new Exception("Retry", $errno);
+				break;
+		}
 	}
 
 	/**

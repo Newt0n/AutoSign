@@ -35,23 +35,18 @@ class YinYueTai extends Sign
 
 		if(!$this->isCookieExist)
 		{
-			$this->get($this->homeUrl);
-
+			// $this->get($this->homeUrl);
 			$data = array(
 				'email'=>$this->username,
 				'password'=>$this->password,
 				);
 			$loginResp = $this->post($this->loginUrl, http_build_query($data), $header);
 			$loginResp = json_decode($loginResp);
-
 			if(!isset($loginResp->error) || $loginResp->error)
-			{
-				$this->logLine .= self::LOGINFAILED;
-				$this->retry();
-			}
+				$this->retry(0);
 		}
-		else
-			$this->get($this->homeUrl);
+		// else
+		// 	$this->get($this->homeUrl);
 
 		//签到
 		$signResp = $this->post($this->signUrl, '', $header);

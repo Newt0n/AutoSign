@@ -73,7 +73,7 @@ class DBank extends Sign
 			$kResp = $this->post($kUrl, http_build_query($loginData), $httpheader);
 			$kResp = json_decode($kResp);
 			if(!isset($kResp->k))
-				throw new Exception("Login failed", 0);
+				$this->retry(0);
 			
 			//访问验证地址，获得 cookie
 			$authUrl = $this->loginUrl.'k='.$kResp->k;
@@ -124,7 +124,7 @@ class DBank extends Sign
 		if(isset($signResp->retdesc))	
 			$this->logLine .= $signResp->retdesc;
 		else
-			$this->retry($this->sercookieFile);
+			$this->retry(1, $this->sercookieFile);
 
 		$this->logLine .= ' ';
 	}
