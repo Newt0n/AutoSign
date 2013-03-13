@@ -49,6 +49,8 @@ class KuaiPan extends Sign
 		$state = null;
 		if(isset($signResp->state))
 			$state = $signResp->state;
+		else
+			$this->retry();
 
 		switch ($state)
 		{
@@ -59,6 +61,7 @@ class KuaiPan extends Sign
 				$this->logLine .= self::SUCCESS.' 获得空间：'.$signResp->rewardsize.'M';
 			break;
 			default:
+				$this->logLine .= $signResp->errcode;
 				$this->retry();
 			break;
 		}

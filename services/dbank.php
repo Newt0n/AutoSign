@@ -104,13 +104,13 @@ class DBank extends Sign
 	/**
 	 * 根据参数生成链接并请求
 	 * @param  array  $signParams 请求参数
-	 * @param  string $secretKey     cookie 中 secretKey 值
+	 * @param  string $secretKey  cookie 中 secretKey 值
 	 */
 	private function signThis($signParams, $secretKey)
 	{
 		//计算 nsp_key
 		foreach ($signParams as $key => $value)
-			$secretKey .=$key.$value;
+			$secretKey .= $key.$value;
 		$signParams['nsp_key'] = md5($secretKey);
 		
 		//生成签到链接
@@ -122,11 +122,9 @@ class DBank extends Sign
 
 		//处理请求结果
 		if(isset($signResp->retdesc))	
-			$this->logLine .= $signResp->retdesc;
+			$this->logLine .= $signResp->retdesc.' ';
 		else
 			$this->retry(1, $this->sercookieFile);
-
-		$this->logLine .= ' ';
 	}
 }
 

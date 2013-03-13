@@ -8,7 +8,7 @@ class Sign
 	//日志状态
 	const SUCCESS     = '签到成功';
 	const SIGNED      = '今天已签到';
-	const FAILED      = '签到失败，重试；';
+	const FAILED      = '签到失败；';
 	const LOGINFAILED = '登录失败；';
 
 	//用户名和密码
@@ -61,7 +61,7 @@ class Sign
 	}
 
 	/**
-	 * 处理配置并发送 POST 请求
+	 * 发送 POST 请求
 	 * @param string  $url
 	 * @param array   $data POST 数据数组
 	 * @param array   $httpheader 需要构造 httpheader 内容的数组

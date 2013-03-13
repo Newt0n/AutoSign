@@ -1,6 +1,6 @@
 <?php
-require('config.inc.php');
-require('sign.php');
+require 'config.inc.php';
+require 'sign.php';
 
 /**
  * 执行签到操作类
@@ -76,7 +76,7 @@ class Executor
 				if(NOTIFY_FAILED)
 					try
 					{
-						$status = $svcName.' 失败多次，请检查日志';
+						$status = $svcName.' 失败多次，请检查日志 #AutoSign#';
 						$this->weiboNotify($status);
 					}
 					catch (Exception $e)
@@ -141,7 +141,6 @@ class Executor
 
 		$status = '@'.$weiboName.' '.$status;
 		$resp = self::$weibo->update($status, $visible, $listId);
-		var_dump($resp);
 		if(isset($resp->error_code))
 			throw new Exception($resp->error);
 	}
