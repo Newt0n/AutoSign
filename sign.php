@@ -25,10 +25,12 @@ class Sign
 
 	//CURL 选项
 	protected $curl_opts = array(
-			CURLOPT_RETURNTRANSFER =>true,
-			CURLINFO_HEADER_OUT=>true,
-			CURLOPT_TIMEOUT=>10,
-			CURLOPT_USERAGENT =>'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.58 Safari/537.22'
+			CURLOPT_RETURNTRANSFER => true,
+			CURLINFO_HEADER_OUT    => true,
+			CURLOPT_SSL_VERIFYPEER => false,
+			CURLOPT_SSL_VERIFYHOST => false,
+			CURLOPT_TIMEOUT        => 10,
+			CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.58 Safari/537.22'
 			);
 
 	/**
@@ -73,8 +75,6 @@ class Sign
 		$options[CURLOPT_URL] = $url;
 		$options[CURLOPT_POST] = true;
 		$options[CURLOPT_POSTFIELDS] = $data;
-		$options[CURLOPT_SSL_VERIFYPEER] = false;
-		$options[CURLOPT_SSL_VERIFYHOST] = false;
 		$options[CURLOPT_FOLLOWLOCATION] = true;
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
 		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;

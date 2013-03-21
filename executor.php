@@ -12,7 +12,7 @@ class Executor
 	private $errCount = 0;
 	//日志文本
 	private $logText;
-	private $state = true;
+	private $allSigned = true;
 	//Weibo 实例
 	private static $weibo = NULL;
 	private static $token = NULL;
@@ -66,13 +66,12 @@ class Executor
 					$errCount++;
 					continue;
 				}
-
 				break;
 			}
 
 			if($errCount >= RETRY_LIMIT)
 			{
-				$this->state = false;
+				$this->allSigned = false;
 				if(NOTIFY_FAILED)
 					try
 					{
@@ -92,27 +91,8 @@ class Executor
 		if(LOG)
 			$this->log();
 
-		if(NOTIFY_SUCCESS && $this->state)
+		if(NOTIFY_SUCCESS && $this->allSigned)
 			$this->weiboNotify('All signed', 2);
-	}
-
-	/**
-	 * 输出日志到文件
-	 */
-	private function log()
-	{
-		file_put_contents('sign.log', $this->logText, FILE_APPEND);
-	}
-
-	/**
-	 * 载入指定路径的文件
-	 * @param  string $filePath
-	 */
-	private function fileLoader($filePath)
-	{
-		if(!file_exists($filePath))
-			throw new Exception("文件丢失 ".$filePath, 1);
-		require_once($filePath);
 	}
 
 	/**
@@ -143,6 +123,34 @@ class Executor
 		$resp = self::$weibo->update($status, $visible, $listId);
 		if(isset($resp->error_code))
 			throw new Exception($resp->error);
+	}
+
+	/**
+	 * 输出日志到文件
+	 */
+	private function log()
+	{
+		file_put_contents('sign.log', $this->logText, FILE_APPEND);
+	}
+
+	/**
+	 * 返回本次签到状态
+	 * @return boolean 全部成功: True, 存在失败: False
+	 */
+	public function isAllSigned()
+	{
+		return $this->allSigned;
+	}
+
+	/**
+	 * 载入指定路径的文件
+	 * @param  string $filePath
+	 */
+	private function fileLoader($filePath)
+	{
+		if(!file_exists($filePath))
+			throw new Exception("文件丢失 ".$filePath, 1);
+		require_once($filePath);
 	}
 }
 
