@@ -12,6 +12,7 @@ AutoSign
 * OneOneFive 115
 * YinYueTai 音悦台
 * DBank 华为网盘
+* WenKu 百度文库
 
 Example
 ======
@@ -26,6 +27,7 @@ $accounts = array(
 	array('OneOneFive', 'Your username', 'Your password'),
 	array('YinYueTai', 'Your username', 'Your password'),
 	array('DBank', 'Your username', 'Your password'),
+	array('WenKu', 'Your username', 'Your password'),
 	);
 
 //执行签到
