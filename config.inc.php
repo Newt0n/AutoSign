@@ -7,3 +7,6 @@ define('RETRY_LIMIT', 3);
 define('NOTIFY_FAILED', FALSE);
 //执行完成发送通知
 define('NOTIFY_SUCCESS', FALSE);
+
+define('DIR_ROOT', dirname(__FILE__));
+define('DIR_PROT', DIR_ROOT.'/protected/');

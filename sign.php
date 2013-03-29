@@ -16,7 +16,7 @@ class Sign
 	protected $password;
 
 	//cookie
-	protected $cookieDir;
+	protected $cookieDir =  DIR_PROT;
 	protected $cookieFile;
 	protected $cookieName;
 
@@ -38,7 +38,7 @@ class Sign
 	 */
 	private function __construct()
 	{
-		$this->cookieDir = dirname(__FILE__).'/protected/';
+		
 	}
 
 	/**
@@ -138,10 +138,10 @@ class Sign
 
 	/**
 	 * 删除 cookie，记录失败日志并抛出异常
-	 * @param int $errno 错误码 0:登录失败 1:签到失败
-	 * @param string $delFileName 需要连带删除的文件路径
+	 * @param int $errno 错误码 0:登录失败 1:签到失败 2:自定义日志
+	 * @param string $log 日志内容
 	 */
-	public function retry($errno = 1, $delFileName = '')
+	public function retry($errno = 1, $log = '')
 	{
 		switch ($errno)
 		{
@@ -151,10 +151,13 @@ class Sign
 				break;
 			case 1:
 				@unlink($this->cookieFile);
-				@unlink($delFileName);
 				$this->isCookieExist = false;
-				$this->logLine .= self::FAILED;
+				$this->logLine .= empty($log) ? self::FAILED : $log;
 				throw new Exception("Retry", $errno);
+				break;
+			case 2:
+				$this->logLine .= $log;
+				throw new Exception($log, $errno);
 				break;
 		}
 	}

@@ -92,21 +92,22 @@ class DBank extends Sign
 		$signParams['nsp_sid'] = $cookies['session'];
 		$signParams['nsp_ts'] = $_SERVER['REQUEST_TIME'];
 		//签到
-		$this->signThis($signParams, $cookies['secret']);
+		$this->signThis('常规签到', $signParams, $cookies['secret']);
 
 		//hao123 转发参数
 		$hao123Params = array_merge($signParams, $this->hao123Svc);
 		//hao123 转发
-		$this->signThis($hao123Params, $cookies['secret']);
+		$this->signThis('hao123 转发', $hao123Params, $cookies['secret']);
 
 	}
 
 	/**
 	 * 根据参数生成链接并请求
+	 * @param  string $name 操作名称
 	 * @param  array  $signParams 请求参数
 	 * @param  string $secretKey  cookie 中 secretKey 值
 	 */
-	private function signThis($signParams, $secretKey)
+	private function signThis($name, $signParams, $secretKey)
 	{
 		//计算 nsp_key
 		foreach ($signParams as $key => $value)
@@ -124,7 +125,10 @@ class DBank extends Sign
 		if(isset($signResp->retdesc))	
 			$this->logLine .= $signResp->retdesc.' ';
 		else
-			$this->retry(1, $this->sercookieFile);
+		{
+			@unlink($this->sercookieFile);
+			$this->retry(1, $name.'失败；');
+		}
 	}
 }
 
