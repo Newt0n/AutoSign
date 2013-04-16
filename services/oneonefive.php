@@ -15,11 +15,11 @@ class OneOneFive extends Sign
 	protected $isCookieExist = true;
 
 	//登录 URL
-	private $loginUrl = 'http://115.com';
-	private $postUrl = 'https://passport.115.com/?ac=login&goto=http%3A%2F%2Fwww.115.com';
+	private $homeUrl = 'http://115.com/';
+	private $postUrl = 'http://passport.115.com/?ac=login&goto=http%3A%2F%2Fwww.115.com';
 
 	//签到 URL
-	private $signUrl = 'http://115.com/?ct=ajax_user&ac=pick_space&token=';
+	private $signUrl = 'http://115.com/?ct=ajax_user&ac=pick_spaces&u=1&token=';
 
 	/**
 	 * 签到方法
@@ -28,18 +28,18 @@ class OneOneFive extends Sign
 	{
 		if(!$this->isCookieExist)
 		{
-			$this->get($this->loginUrl);
 			$data = array(
 				'login[account]'=>$this->username,
 				'login[passwd]'=>$this->password,
 				'login[time]'=>'on',
 				'back'=>'http://www.115.com'
 				);
-			$loginResp = $this->post($this->postUrl, $data);
+			$this->post($this->postUrl, $data);
+			
 		}
-
-		$getResp = $this->get($this->loginUrl);
-		preg_match('/take_token:\s*\'([^\']*)/', $getResp, $match);
+		
+		$homeResp = $this->get($this->homeUrl);
+		preg_match('/take_token:\s*\'([^\']*)/', $homeResp, $match);
 		if(empty($match[0]))
 			$this->retry();
 		if(empty($match[1]))
