@@ -77,7 +77,7 @@ class DBank extends Sign
 			
 			//访问验证地址，获得 cookie
 			$authUrl = $this->loginUrl.'k='.$kResp->k;
-			$header = $this->get($authUrl, true, true);
+			$header = $this->get($authUrl, array(), true);
 			preg_match_all('/Set-Cookie: (.+?)=(.+?);/', $header, $match);
 			$cookies = array();
 			foreach ($match[1] as $key => $value)

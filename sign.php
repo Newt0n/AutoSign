@@ -66,7 +66,7 @@ class Sign
 	 * 发送 POST 请求
 	 * @param string  $url
 	 * @param array   $data POST 数据数组
-	 * @param array   $httpheader 需要构造 httpheader 内容的数组
+	 * @param array   $httpheader 构造 httpheader 内容的数组
 	 * @param boolean $header 是否输出 header 信息
 	 */
 	protected function post($url, $data = array(), $httpheader = array(), $header = false)
@@ -82,21 +82,23 @@ class Sign
 			$options[CURLOPT_HTTPHEADER] = $httpheader;
 		if($header)
 			$options[CURLOPT_HEADER] = true;
-
 		return $this->curl($options);
 	}
 
 	/**
 	 * 发送 GET 请求
 	 * @param string  $url
+	 * @param array   httpheader 构造 httpheader 内容的数组
 	 * @param boolean $header 是否输出 header 信息
 	 */
-	protected function get($url, $header = false)
+	protected function get($url, $httpheader = array(), $header = false)
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
 		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
+		if(!empty($httpheader))
+			$options[CURLOPT_HTTPHEADER] = $httpheader;
 		if($header)
 			$options[CURLOPT_HEADER] = true;
 		return $this->curl($options);
