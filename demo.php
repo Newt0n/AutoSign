@@ -18,6 +18,7 @@ $accounts = array(
 	array('OneOneFive', 'Your username', 'Your password'),
 	array('YinYueTai', 'Your username', 'Your password'),
 	array('DBank', 'Your username', 'Your password'),
+	array('Vdisk', 'Your username', 'Your password')
 	);
 
 //config.inc.php 配置选项

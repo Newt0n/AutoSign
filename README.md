@@ -13,6 +13,7 @@ AutoSign
 * YinYueTai 音悦台
 * DBank 华为网盘
 * WenKu 百度文库
+* Vdisk 微博微盘
 
 Example
 ======
@@ -28,6 +29,7 @@ $accounts = array(
 	array('YinYueTai', 'Your username', 'Your password'),
 	array('DBank', 'Your username', 'Your password'),
 	array('WenKu', 'Your username', 'Your password'),
+	array('Vdisk', 'Your username', 'Your password'),
 	);
 
 //执行签到

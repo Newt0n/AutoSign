@@ -95,6 +95,7 @@ class Sign
 	{
 		$options = $this->curl_opts;
 		$options[CURLOPT_URL] = $url;
+		$options[CURLOPT_FOLLOWLOCATION] = true;
 		$options[CURLOPT_COOKIEJAR] = $this->cookieFile;
 		$options[CURLOPT_COOKIEFILE] = $this->cookieFile;
 		if(!empty($httpheader))
