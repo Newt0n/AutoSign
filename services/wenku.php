@@ -14,11 +14,13 @@ class WenKu extends Sign
 	//cookie 存在标识
 	protected $isCookieExist = true;
 
-	//登录 URL
-	private $homeUrl = 'http://wenku.baidu.com/user/index';
+	//相关 URL
+	private $homeUrl = 'http://wenku.baidu.com/user/task';
 	private $postUrl = 'https://passport.baidu.com/v2/api/?login';
 	private $getApiUrl = 'http://passport.baidu.com/v2/api/?getapi&class=login&tpl=do&tangram=true';
 	private $awardDailyUrl = 'http://wenku.baidu.com/taskui/control/awarddailytask';
+	private $wapUrl = 'http://wapwenku.baidu.com/uc/';
+	private $loginNotiUrl = 'http://wenku.baidu.com/login';
 
 	/**
 	 * 设置 UA 为百度浏览器增加积分
@@ -34,7 +36,6 @@ class WenKu extends Sign
 	public function sign()
 	{
 		$homeResp = $this->get($this->homeUrl);
-		//百度文库登录即签到
 		if(strpos($homeResp, '<li id="mywenku"') === false)
 		{
 			//获取 token
@@ -68,6 +69,15 @@ class WenKu extends Sign
 			if(strpos($loginResp, 'error=0') === false)
 				$this->retry(0);
 		}
+
+		$httpheader = array(
+			'Referer: '.$this->wapUrl
+			);
+		$this->get($this->wapUrl, $httpheader);
+		//登录通知
+		$this->get($this->loginNotiUrl, $httpheader);
+
+		//连续签到奖励
 		$this->awardDaily(4);
 		$this->awardDaily(7);
 		$this->logLine .= self::SIGNED;
@@ -77,13 +87,20 @@ class WenKu extends Sign
 	{
 		$data = array(
 			'type'=>'task',
-			'task_id'=>'2',
+			'task_id'=>2,
 			'prize'=>$days
 			);
-		$resp = $this->post($this->awardDailyUrl, http_build_query($data));
+
+		$httpheader = array(
+			'Origin:http://wenku.baidu.com',
+			'Referer:http://wenku.baidu.com/task/browse/daily?tab=1',
+			'X-Requested-With:XMLHttpRequest'
+			);
+		
+		$resp = $this->post($this->awardDailyUrl, http_build_query($data), $httpheader);
 		$resp = json_decode($resp);
-		if($resp->error_no == 0)
-			$this->logLine .= '领取连续 '.$days.' 天奖励 ';
+		if(isset($resp->error_no) && $resp->error_no == 0)
+			$this->logLine .= '领取签到 '.$days.' 天奖励 ';
 	}
 
 }
