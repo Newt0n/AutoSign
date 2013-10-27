@@ -45,6 +45,18 @@ class OneOneFive extends Sign
 			$this->post($this->postUrl, $data, $httpheader);
 		}
 
+		$checkResp = $this->get($this->homeUrl.'?ct=ajax_user&ac=checkin', array('X-Requested-With:XMLHttpRequest'));
+		$checkResp = json_decode($checkResp);
+		if(!empty($checkResp) && isset($checkResp->state)) {
+			if($checkResp->state) {
+				$this->logLine .= '每日签到获得空间 '.$checkResp->data->this_turn_space.'，明天将获得 '.$checkResp->data->next_turn_space.'/';
+			} else {
+				$this->logLine .= $checkResp->err_msg.'/';
+			}
+		} else {
+			$this->retry();
+		}
+
 		$homeResp = $this->get($this->homeUrl);
 		preg_match('/take_token:\s*\'([^\']*)/', $homeResp, $match);
 		if(empty($match[0]))
@@ -59,7 +71,7 @@ class OneOneFive extends Sign
 		$signResp = $this->get($this->signUrl.$token.'&_='.time());
 		$signResp = json_decode($signResp);
 		if(isset($signResp->picked))
-			$this->logLine .= self::SUCCESS.' 获得空间：'.$signResp->picked.' 总容量：'.$signResp->total_size;
+			$this->logLine .= self::SUCCESS.' 获得空间 '.$signResp->picked.'，总容量 '.$signResp->total_size;
 		else
 		{
 			@$this->logLine .= $signResp->msg;
