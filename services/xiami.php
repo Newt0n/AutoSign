@@ -15,9 +15,9 @@ class XiaMi extends Sign
     protected $isCookieExist = true;
 
     //登录 URL
-    private $homeUrl = 'http://www.xiami.com/home';
+    private $homeUrl = 'http://www.xiami.com/';
     private $loginUrl = 'https://login.xiami.com/member/login';
-    private $rightInfoUrl = 'http://www.xiami.com/index/indexright?_=';
+    // private $rightInfoUrl = 'http://www.xiami.com/index/indexright?_=';
 
     //签到 URL
     private $signUrl = 'http://www.xiami.com/task/signin';
@@ -52,7 +52,7 @@ class XiaMi extends Sign
         $httpheader = $this->httpheader;
         $httpheader[2] = $this->homeUrl;
         // 获得新 t_sign_auth
-        $this->get($this->rightInfoUrl.time(), $httpheader);
+        // $this->get($this->rightInfoUrl.time(), $httpheader);
 
         // 请求每日歌单
         $httpheader[2] = 'http://www.xiami.com/task/all';
