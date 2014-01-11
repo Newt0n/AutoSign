@@ -17,7 +17,7 @@ class XiaMi extends Sign
     //登录 URL
     private $homeUrl = 'http://www.xiami.com/';
     private $loginUrl = 'https://login.xiami.com/member/login';
-    // private $rightInfoUrl = 'http://www.xiami.com/index/indexright?_=';
+    private $signAuthUrl = 'http://www.xiami.com/index/home?_=';
 
     //签到 URL
     private $signUrl = 'http://www.xiami.com/task/signin';
@@ -26,8 +26,8 @@ class XiaMi extends Sign
     private $dailyPoint = 'http://www.xiami.com/task/gain/type/25/id/0';
     // private $editPlayList = 'http://www.xiami.com/member/edit-playlist?ids=';
     private $httpheader = array(
-                'Host: www.xiami.com',
-                'X-Requested-With: XMLHttpRequest'
+                'host' => 'Host: www.xiami.com',
+                'xhr' => 'X-Requested-With: XMLHttpRequest'
                 );
 
     /**
@@ -50,17 +50,17 @@ class XiaMi extends Sign
         }
 
         $httpheader = $this->httpheader;
-        $httpheader[2] = $this->homeUrl;
+        $httpheader['referer'] = 'Referer: '. $this->homeUrl;
         // 获得新 t_sign_auth
-        // $this->get($this->rightInfoUrl.time(), $httpheader);
+        $this->get($this->signAuthUrl.time(), $httpheader);
 
         // 请求每日歌单
-        $httpheader[2] = 'http://www.xiami.com/task/all';
+        $httpheader['referer'] = 'Referer: http://www.xiami.com/task/all';
         $this->get('http://www.xiami.com/task/fetch-task?type=25&id=0', $httpheader);
         $this->get($this->homeUrl, $httpheader);
-        $httpheader[2] = 'Referer: http://www.xiami.com/?task';
+        $httpheader['referer'] = 'Referer: http://www.xiami.com/?task';
         $this->get($this->allSongPlay, $httpheader);
-        $httpheader[2] = 'Referer: http://www.xiami.com/song/play?ids=/song/playlist-default';
+        $httpheader['referer'] = 'Referer: http://www.xiami.com/song/play?ids=/song/playlist-default';
         $songsXML = $this->get($this->dailyPlayList, $httpheader);
 
         // 改变播放列表
@@ -76,12 +76,12 @@ class XiaMi extends Sign
         // $this->get($this->editPlayList.implode($songsId, ','));
 
         // 领取每日积分
-        $httpheader[2] = 'Referer: http://www.xiami.com/task/all';
+        $httpheader['referer'] = 'Referer: http://www.xiami.com/task/all';
         $this->get($this->dailyPoint);
 
         // 签到
         $httpheader = $this->httpheader;
-        $httpheader[2] = 'Referer: http://www.xiami.com/home';
+        $httpheader['referer'] = 'Referer: http://www.xiami.com/home';
         $signResp = $this->post($this->signUrl, array(), $httpheader);
         if(empty($signResp) || intval($signResp) < 1)
             $this->retry();
